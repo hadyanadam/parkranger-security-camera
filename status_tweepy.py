@@ -3,6 +3,7 @@ import time
 import telepot
 import os
 import tweepy
+import time
 from dotenv import load_dotenv
 from pathlib import Path
 from picamera import PiCamera
@@ -34,13 +35,27 @@ if __name__ == "__main__":
             detected = False
             tweet_text = "Pelanggar Peraturan Taman"
             image_path = '/home/pi/captured.jpg'
+            time_start = time.time()
             camera.capture(image_path)
+            time_capture = round(time.time() - time_start, 2)
+            print(f"time to capture : {time_capture} second")
+            time_start = time.time()
             blur_path = muka_blur(image_path)
+            time_toblur = round(time.time() - time_start, 2)
+            print(f"time to blur : {time_toblur} second")
+            time_start = time.time()
             bot.sendPhoto(chat_id, photo=open(blur_path, 'rb'))
+            time_totelegram = round(time.time() - time_start, 2)
+            print(f"time to telgram : {time_totelegram} second")
+            time_start = time.time()
             # bot.sendMessage(chat_id, tweet_text)
             api.update_with_media(blur_path, tweet_text)
+            time_totwitter = round(time.time() - time_start, 2)
+            print(f"time to twitter : {time_totwitter} second")
             # api.update_status(status=tweet_text)
             print('done.')
+            time_total = round((time_toblur + time_totwitter + time_totelegram + time_capture), 2)
+            print(f"time to done : {time_total} second")
             time.sleep(3)
         elif not detected:
             detected = True
